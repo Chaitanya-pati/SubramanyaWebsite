@@ -1,7 +1,13 @@
+using SubramanyaWebsite.Models;
+using SubramanyaWebsite.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.Configure<EmailSettings>(
+    builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddSingleton<IEmailService, SmtpEmailService>();
 
 var app = builder.Build();
 

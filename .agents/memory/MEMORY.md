@@ -1,1 +1,2 @@
 - [Protected Replit config](replit-config.md) — `.replit` changes must go through the platform’s validated replacement flow.
+- [Imported .NET workflows](dotnet-workflow.md) — .NET 8 projects may need the available SDK path made explicit in the managed workflow.
