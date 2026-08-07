@@ -25,13 +25,11 @@ public sealed class SmtpEmailService : IEmailService
 
         var from = new MailboxAddress(_settings.FromName, _settings.FromEmail);
         var recipients = _settings.RecipientEmails
-            .Select(email => new MailboxAddress("Sri Subramanya Home Healthcare", email))
+            .Select(email => ParseMailbox(email, "recipient"))
             .ToArray();
 
         using var smtp = new SmtpClient();
-        var socketOption = _settings.UseSsl
-            ? SecureSocketOptions.SslOnConnect
-            : SecureSocketOptions.StartTlsWhenAvailable;
+        var socketOption = GetSocketOption();
 
         try
         {
@@ -57,10 +55,13 @@ public sealed class SmtpEmailService : IEmailService
                     """
             };
             await smtp.SendAsync(notification, cancellationToken);
+            _logger.LogInformation(
+                "Care request notification accepted by SMTP server for {RequestEmail}.",
+                request.Email);
 
             var confirmation = new MimeMessage();
             confirmation.From.Add(from);
-            confirmation.To.Add(new MailboxAddress(request.Name, request.Email));
+            confirmation.To.Add(ParseMailbox(request.Email, "request"));
             confirmation.Subject = "Thank you for contacting Sri Subramanya Home Healthcare";
             confirmation.Body = new TextPart("plain")
             {
@@ -79,6 +80,9 @@ public sealed class SmtpEmailService : IEmailService
                     """
             };
             await smtp.SendAsync(confirmation, cancellationToken);
+            _logger.LogInformation(
+                "Care request confirmation accepted by SMTP server for {RequestEmail}.",
+                request.Email);
 
             await smtp.DisconnectAsync(true, cancellationToken);
         }
@@ -86,6 +90,34 @@ public sealed class SmtpEmailService : IEmailService
         {
             _logger.LogError(ex, "Unable to send care request emails for {RequestEmail}", request.Email);
             throw;
+        }
+    }
+
+    private SecureSocketOptions GetSocketOption()
+    {
+        if (!_settings.UseSsl)
+        {
+            return SecureSocketOptions.None;
+        }
+
+        // Port 465 uses implicit TLS. The common submission ports 587 and
+        // 2525 negotiate TLS with STARTTLS after connecting.
+        return _settings.SmtpPort == 465
+            ? SecureSocketOptions.SslOnConnect
+            : SecureSocketOptions.StartTls;
+    }
+
+    private static MailboxAddress ParseMailbox(string address, string addressType)
+    {
+        try
+        {
+            return MailboxAddress.Parse(address);
+        }
+        catch (ParseException ex)
+        {
+            throw new InvalidOperationException(
+                $"Email settings contain an invalid {addressType} address: '{address}'.",
+                ex);
         }
     }
 
@@ -103,6 +135,12 @@ public sealed class SmtpEmailService : IEmailService
         {
             throw new InvalidOperationException(
                 $"Email settings are incomplete. Configure: {string.Join(", ", missing)}.");
+        }
+
+        _ = ParseMailbox(_settings.FromEmail, "sender");
+        foreach (var recipient in _settings.RecipientEmails)
+        {
+            _ = ParseMailbox(recipient, "recipient");
         }
     }
 }

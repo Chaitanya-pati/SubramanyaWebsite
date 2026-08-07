@@ -17,7 +17,8 @@ Secrets/environment variables before using the form in production:
 
 - `EmailSettings__SmtpHost`
 - `EmailSettings__SmtpPort` (`465` for implicit SSL, or `587` for STARTTLS)
-- `EmailSettings__UseSsl` (`true` for SSL/TLS)
+- `EmailSettings__UseSsl` (`true` to require encryption; port `465` uses
+  implicit TLS and ports such as `587`/`2525` use STARTTLS)
 - `EmailSettings__Username`
 - `EmailSettings__Password`
 - `EmailSettings__FromEmail`
@@ -27,3 +28,9 @@ Secrets/environment variables before using the form in production:
 Do not commit SMTP passwords to `appsettings.json` or source control. The sender
 address should normally be the authenticated SMTP account or an address authorized
 by that account.
+
+When a request is submitted, the application authenticates with the SMTP server,
+sends the care-team notification first, and then sends a separate confirmation
+to the visitor's submitted email address. A successful form response means the
+SMTP server accepted both messages; inbox placement still depends on the email
+provider and spam filtering.
