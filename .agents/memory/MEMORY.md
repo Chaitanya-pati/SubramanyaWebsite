@@ -1,0 +1,1 @@
+- [Protected Replit config](replit-config.md) — `.replit` changes must go through the platform’s validated replacement flow.
