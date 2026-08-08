@@ -23,10 +23,7 @@ public sealed class SmtpEmailService : IEmailService
     {
         ValidateSettings();
 
-        var from = new MailboxAddress(_settings.FromName, _settings.FromEmail);
-        var recipients = _settings.RecipientEmails
-            .Select(email => ParseMailbox(email, "recipient"))
-            .ToArray();
+        var sender = ParseMailbox(_settings.Username, "username");
 
         using var smtp = new SmtpClient();
         var socketOption = GetSocketOption();
@@ -37,8 +34,8 @@ public sealed class SmtpEmailService : IEmailService
             await smtp.AuthenticateAsync(_settings.Username, _settings.Password, cancellationToken);
 
             var notification = new MimeMessage();
-            notification.From.Add(from);
-            notification.To.AddRange(recipients);
+            notification.From.Add(new MailboxAddress(_settings.FromName, sender.Address));
+            notification.To.Add(sender);
             notification.ReplyTo.Add(new MailboxAddress(request.Name, request.Email));
             notification.Subject = $"New home care request from {request.Name}";
             notification.Body = new TextPart("plain")
@@ -60,7 +57,7 @@ public sealed class SmtpEmailService : IEmailService
                 request.Email);
 
             var confirmation = new MimeMessage();
-            confirmation.From.Add(from);
+            confirmation.From.Add(new MailboxAddress(_settings.FromName, sender.Address));
             confirmation.To.Add(ParseMailbox(request.Email, "request"));
             confirmation.Subject = "Thank you for contacting Sri Subramanya Home Healthcare";
             confirmation.Body = new TextPart("plain")
@@ -128,8 +125,6 @@ public sealed class SmtpEmailService : IEmailService
         if (_settings.SmtpPort <= 0) missing.Add("SmtpPort");
         if (string.IsNullOrWhiteSpace(_settings.Username)) missing.Add("Username");
         if (string.IsNullOrWhiteSpace(_settings.Password)) missing.Add("Password");
-        if (string.IsNullOrWhiteSpace(_settings.FromEmail)) missing.Add("FromEmail");
-        if (_settings.RecipientEmails.Length == 0) missing.Add("Emails");
 
         if (missing.Count > 0)
         {
@@ -137,10 +132,6 @@ public sealed class SmtpEmailService : IEmailService
                 $"Email settings are incomplete. Configure: {string.Join(", ", missing)}.");
         }
 
-        _ = ParseMailbox(_settings.FromEmail, "sender");
-        foreach (var recipient in _settings.RecipientEmails)
-        {
-            _ = ParseMailbox(recipient, "recipient");
-        }
+        _ = ParseMailbox(_settings.Username, "username");
     }
 }

@@ -7,10 +7,5 @@ public sealed class EmailSettings
     public bool UseSsl { get; set; } = true;
     public string Username { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
-    public string FromEmail { get; set; } = string.Empty;
     public string FromName { get; set; } = "Sri Subramanya Home Healthcare";
-    public string Emails { get; set; } = string.Empty;
-
-    public string[] RecipientEmails =>
-        Emails.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 }
