@@ -8,6 +8,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.Configure<EmailSettings>(
     builder.Configuration.GetSection("EmailSettings"));
 builder.Services.AddSingleton<IEmailService, SmtpEmailService>();
+builder.Services.AddSingleton<EmailQueue>();
+builder.Services.AddSingleton<IEmailQueue>(services => services.GetRequiredService<EmailQueue>());
+builder.Services.AddHostedService<EmailQueueWorker>();
 
 var app = builder.Build();
 

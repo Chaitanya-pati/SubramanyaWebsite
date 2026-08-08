@@ -28,8 +28,10 @@ Do not commit SMTP passwords to `appsettings.json` or source control. The sender
 and care-team recipient are automatically taken from the authenticated SMTP
 username.
 
-When a request is submitted, the application authenticates with the SMTP server,
-sends the care-team notification first, and then sends a separate confirmation
-to the visitor's submitted email address. A successful form response means the
-SMTP server accepted both messages; inbox placement still depends on the email
-provider and spam filtering.
+When a request is submitted, the application places a copy of the request on a
+bounded background email queue and responds immediately. A hosted worker then
+authenticates with the SMTP server, sends the care-team notification first, and
+sends a separate confirmation to the visitor's submitted email address. Delivery
+failures are logged by the worker instead of delaying the visitor's response.
+The form also includes a server-validated honeypot field; submissions that fill
+it are silently ignored so common automated bots do not generate email.

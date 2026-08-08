@@ -4,6 +4,9 @@ namespace SubramanyaWebsite.Models;
 
 public sealed class CareRequest
 {
+    // Honeypot field: real visitors never see or fill this input.
+    public string? Website { get; set; }
+
     [Required, StringLength(120)]
     public string Name { get; set; } = string.Empty;
 
