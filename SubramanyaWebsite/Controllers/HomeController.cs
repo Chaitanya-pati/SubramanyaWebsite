@@ -51,7 +51,7 @@ namespace SubramanyaWebsite.Controllers
                 return StatusCode(500, new
                 {
                     success = false,
-                    message = "We could not send your request right now. Please call +91 98864 12345."
+                    message = "We could not send your request right now. Please call +91 96325 54468 or +91 97392 113907."
                 });
             }
         }

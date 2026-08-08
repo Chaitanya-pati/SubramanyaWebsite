@@ -99,7 +99,7 @@ public sealed class SmtpEmailService : IEmailService
         We have received your request for {request.RequiredService} for {request.PatientName}.
 
         Our care coordinator will contact you at {request.Phone} within 15 minutes.
-        If you need immediate assistance, please call +91 98864 12345.
+        If you need immediate assistance, please call +91 96325 54468 or +91 97392 113907.
 
         Regards,
         Sri Subramanya Home Healthcare
@@ -191,7 +191,7 @@ public sealed class SmtpEmailService : IEmailService
                     Our care coordinator will contact you at <strong>{phone}</strong> within 15 minutes.
                   </div>
                   <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#64748b;">
-                    Need immediate assistance? Call <strong style="color:#0f766e;">+91 98864 12345</strong>.
+                    Need immediate assistance? Call <strong style="color:#0f766e;">+91 96325 54468</strong> or <strong style="color:#0f766e;">+91 97392 113907</strong>.
                   </p>
                 </td>
               </tr>
